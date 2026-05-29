@@ -2,10 +2,10 @@ import os
 import json
 import requests
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, abort
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
@@ -24,6 +24,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Database Models
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -62,6 +63,7 @@ class MessageLog(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Routes
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
