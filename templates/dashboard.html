@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - WhatsApp Automation{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon rules">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_rules }}</h3>
+                <p>Total Rules</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ active_rules }}</h3>
+                <p>Active Rules</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon messages">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ total_messages }}</h3>
+                <p>Total Messages</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon replied">
+                <i class="fas fa-reply"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ replied_messages }}</h3>
+                <p>Auto-Replied</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <div class="section-header">
+            <h2><i class="fas fa-history"></i> Recent Messages</h2>
+            <a href="{{ url_for('rules') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Rule
+            </a>
+        </div>
+        
+        {% if recent_messages %}
+        <div class="table-container">
+            
+                    {% for msg in recent_messages %}
+                    
+                    {% endfor %}
+                <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>From</th>
+                        <th>Message</th>
+                        <th>Response</th>
+                        <th>Status</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody><tr>
+                        <td>{{ msg.from_number }}</td>
+                        <td class="truncate">{{ msg.message_text[:50] }}{% if msg.message_text|length &gt; 50 %}...{% endif %}</td>
+                        <td class="truncate">{{ msg.response_text[:50] if msg.response_text else '-' }}{% if msg.response_text and msg.response_text|length &gt; 50 %}...{% endif %}</td>
+                        <td>
+                            {% if msg.was_replied %}
+                            <span class="badge success"><i class="fas fa-check"></i> Replied</span>
+                            {% else %}
+                            <span class="badge warning"><i class="fas fa-clock"></i> Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ msg.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr></tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No messages yet. Set up your webhook to start receiving messages.</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="section webhook-info">
+        <h2><i class="fas fa-plug"></i> Webhook Configuration</h2>
+        <div class="info-box">
+            <p><strong>Webhook URL:</strong> <code>{{ request.host_url }}webhook</code></p>
+            <p><strong>Verify Token:</strong> <code>your-verify-token</code> (set in .env)</p>
+            <p class="hint">Configure this URL in your Meta Developer Dashboard under WhatsApp &gt; Configuration</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
