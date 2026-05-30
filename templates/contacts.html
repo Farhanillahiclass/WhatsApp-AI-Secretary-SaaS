@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Contacts - WhatsApp AI Secretary{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div class="page-title">
+        <h2>Contacts</h2>
+        <p>Manage your WhatsApp contacts</p>
+    </div>
+    <button class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Contact
+    </button>
+</div>
+
+<div class="contacts-toolbar">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" class="form-control" placeholder="Search contacts..." value="{{ search }}">
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+        <button class="btn btn-secondary"><i class="fas fa-filter"></i> Filter</button>
+        <button class="btn btn-secondary"><i class="fas fa-download"></i> Export</button>
+    </div>
+</div>
+
+<div class="contact-grid">
+    {% for contact in contacts.items %}
+    <div class="contact-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div class="contact-avatar">{{ contact.name[0].upper() if contact.name else contact.phone_number[-2:] }}</div>
+            <form method="POST" action="{{ url_for('delete_contact', contact_id=contact.id) }}">
+                <button type="submit" class="btn btn-icon btn-sm" style="color: var(--danger);">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </div>
+        <div class="contact-name">{{ contact.name or 'Unnamed' }}</div>
+        <div class="contact-phone"><i class="fab fa-whatsapp"></i> {{ contact.phone_number }}</div>
+        {% if contact.tags %}
+        <div class="contact-tags">
+            {% for tag in contact.tags.split(',') %}
+            <span class="contact-tag">{{ tag.strip() }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if contact.last_contact %}
+        <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--gray);">
+            <i class="fas fa-clock"></i> Last contact: {{ contact.last_contact.strftime('%b %d') }}
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="grid-column: 1 / -1;">
+        <i class="fas fa-address-book"></i>
+        <h3>No contacts yet</h3>
+        <p>Add your first contact to start messaging</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if contacts.has_next or contacts.has_prev %}
+<div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+    {% if contacts.has_prev %}
+    <a href="{{ url_for('contacts', page=contacts.prev_num, search=search) }}" class="btn btn-secondary">Previous</a>
+    {% endif %}
+    <span class="btn" style="cursor: default;">Page {{ contacts.page }} of {{ contacts.pages }}</span>
+    {% if contacts.has_next %}
+    <a href="{{ url_for('contacts', page=contacts.next_num, search=search) }}" class="btn btn-secondary">Next</a>
+    {% endif %}
+</div>
+{% endif %}
+
+
+<div id="addContactModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add New Contact</h3>
+            <button type="button" class="btn btn-icon" style="border: none; background: none; font-size: 1.5rem;">×</button>
+        </div>
+        <form method="POST" action="{{ url_for('add_contact') }}">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" placeholder="Contact name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number *</label>
+                    <input type="tel" name="phone" class="form-control" required="" placeholder="+1234567890">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tags (comma separated)</label>
+                    <input type="text" name="tags" class="form-control" placeholder="customer, vip, lead">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea name="notes" class="form-control" rows="3" placeholder="Additional notes..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Contact</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

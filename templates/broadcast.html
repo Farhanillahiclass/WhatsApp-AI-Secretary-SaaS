@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Broadcast - WhatsApp AI Secretary{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div class="page-title">
+        <h2>Broadcast Message</h2>
+        <p>Send messages to multiple contacts at once</p>
+    </div>
+</div>
+
+<div class="broadcast-builder">
+    <div class="message-composer">
+        <div class="composer-toolbar">
+            <button type="button" title="Bold"><i class="fas fa-bold"></i></button>
+            <button type="button" title="Italic"><i class="fas fa-italic"></i></button>
+            <button type="button" title="Insert Variable"><i class="fas fa-code"></i></button>
+            <button type="button" title="Emoji"><i class="far fa-smile"></i></button>
+        </div>
+        <form method="POST" action="{{ url_for('send_broadcast') }}">
+            <div class="form-group">
+                <label class="form-label">Message</label>
+                <textarea name="message" class="form-control" rows="6" placeholder="Type your broadcast message..." required=""></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Or Select Template</label>
+                <select name="template_id" class="form-control">
+                    <option value="">-- No Template --</option>
+                    {% for template in templates %}
+                    <option value="{{ template.id }}">{{ template.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="card" style="margin-top: 1.5rem;">
+                <div class="card-header">
+                    <h4>Select Recipients</h4>
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="selectAll"> Select All
+                    </label>
+                </div>
+                <div class="recipient-list">
+                    {% for contact in contacts %}
+                    <label class="recipient-item">
+                        <input type="checkbox" name="contacts" value="{{ contact.id }}">
+                        <div class="contact-avatar" style="width: 32px; height: 32px; font-size: 0.875rem; margin: 0;">
+                            {{ contact.name[0].upper() if contact.name else contact.phone_number[-2:] }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 500;">{{ contact.name or 'Unnamed' }}</div>
+                            <div style="font-size: 0.75rem; color: var(--gray);">{{ contact.phone_number }}</div>
+                        </div>
+                    </label>
+                    {% else %}
+                    <div class="empty-state" style="padding: 2rem;">
+                        <p>No contacts available</p>
+                        <a href="{{ url_for('contacts') }}" class="btn btn-sm btn-primary">Add Contacts</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">
+                <i class="fas fa-paper-plane"></i> Send Broadcast
+            </button>
+        </form>
+    </div>
+    
+    <div class="recipient-panel">
+        <h3 style="margin-bottom: 1rem;"><i class="fas fa-info-circle"></i> Broadcast Tips</h3>
+        <ul style="list-style: none; color: var(--gray); font-size: 0.875rem; line-height: 2;">
+            <li><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Use templates for consistency</li>
+            <li><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Personalize with variables</li>
+            <li><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Test before sending</li>
+            <li><i class="fas fa-check" style="color: var(--success); margin-right: 0.5rem;"></i> Respect rate limits</li>
+        </ul>
+        
+        <div class="card" style="margin-top: 1.5rem; background: var(--primary-light);">
+            <div style="text-align: center;">
+                <i class="fas fa-shield-alt" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;"></i>
+                <p style="font-size: 0.875rem; color: var(--dark);">Your messages are sent securely via WhatsApp Business API</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

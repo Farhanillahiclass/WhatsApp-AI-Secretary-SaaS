@@ -2,39 +2,42 @@
 
 {% block title %}Login - WhatsApp AI Secretary{% endblock %}
 
-{% block content %}
-<div class="auth-container">
+{% block auth_content %}
+<div class="auth-page">
     <div class="auth-card">
-        <div class="auth-header">
+        <div class="auth-logo">
             <i class="fab fa-whatsapp"></i>
             <h1>WhatsApp AI Secretary</h1>
-            <p>Login to your account</p>
+            <p>Automate your WhatsApp conversations</p>
         </div>
         
         <form method="POST" action="{{ url_for('login') }}">
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required="" placeholder="Enter your username">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required placeholder="Enter your username">
             </div>
             
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required="" placeholder="Enter your password">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required placeholder="Enter your password">
             </div>
             
-            <div class="form-group remember">
-                <label>
+            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                     <input type="checkbox" name="remember"> Remember me
                 </label>
+                <a href="#" style="color: var(--primary); font-size: 0.875rem;">Forgot password?</a>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-block">
-                <i class="fas fa-sign-in-alt"></i> Login
+            <button type="submit" class="btn btn-primary btn-block" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-sign-in-alt"></i> Sign In
             </button>
         </form>
         
-        <div class="auth-footer">
-            <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+        <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-light);">
+            <p style="color: var(--gray); font-size: 0.875rem;">
+                Don't have an account? <a href="{{ url_for('register') }}" style="color: var(--primary); font-weight: 500;">Create one</a>
+            </p>
         </div>
     </div>
 </div>

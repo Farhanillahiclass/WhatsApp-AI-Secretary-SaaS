@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Message Templates - WhatsApp AI Secretary{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div class="page-title">
+        <h2>Message Templates</h2>
+        <p>Create reusable message templates</p>
+    </div>
+    <button class="btn btn-primary">
+        <i class="fas fa-plus"></i> New Template
+    </button>
+</div>
+
+<div class="contact-grid">
+    {% for template in templates %}
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <div>
+                <span class="badge badge-info">{{ template.category }}</span>
+                <h4 style="margin-top: 0.5rem;">{{ template.name }}</h4>
+            </div>
+            <form method="POST" action="{{ url_for('delete_template', template_id=template.id) }}">
+                <button type="submit" class="btn btn-icon btn-sm" style="color: var(--danger);">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </div>
+        <div style="background: var(--gray-light); padding: 1rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.875rem; white-space: pre-wrap;">{{ template.content }}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--gray);">
+            <span><i class="fas fa-chart-bar"></i> Used {{ template.usage_count }} times</span>
+            <span>{{ template.created_at.strftime('%b %d, %Y') }}</span>
+        </div>
+        {% if template.variables %}
+        <div style="margin-top: 0.75rem;">
+            <small style="color: var(--gray);">Variables: {{ template.variables }}</small>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="empty-state" style="grid-column: 1 / -1;">
+        <i class="fas fa-file-alt"></i>
+        <h3>No templates yet</h3>
+        <p>Create templates for quick messaging</p>
+    </div>
+    {% endfor %}
+</div>
+
+
+<div id="addTemplateModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create Template</h3>
+            <button type="button" class="btn btn-icon" style="border: none; background: none; font-size: 1.5rem;">×</button>
+        </div>
+        <form method="POST" action="{{ url_for('add_template') }}">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Template Name</label>
+                    <input type="text" class="form-control" required="" placeholder="e.g., Welcome Message">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-control">
+                        <option value="general">General</option>
+                        <option value="welcome">Welcome</option>
+                        <option value="followup">Follow-up</option>
+                        <option value="promotional">Promotional</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Content</label>
+                    <textarea name="content" class="form-control" rows="5" required="" placeholder="Template content... Use {{name}} for variables"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Variables (comma separated)</label>
+                    <input type="text" name="variables" class="form-control" placeholder="name, date, offer">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Template</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

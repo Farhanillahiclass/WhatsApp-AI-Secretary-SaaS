@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - WhatsApp AI Secretary{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <div class="page-title">
+        <h2>Settings</h2>
+        <p>Manage your account and preferences</p>
+    </div>
+</div>
+
+<div class="rules-grid">
+    <div class="card">
+        <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-user-circle"></i> Profile Settings</h3>
+        <form method="POST" action="{{ url_for('settings') }}">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" value="{{ current_user.username }}" disabled="">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" value="{{ current_user.email }}" disabled="">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Timezone</label>
+                <select name="timezone" class="form-control">
+                    <option value="UTC">UTC</option>
+                    <option value="Asia/Karachi">Pakistan (Asia/Karachi)</option>
+                    <option value="Asia/Dubai">Dubai (Asia/Dubai)</option>
+                    <option value="America/New_York">New York</option>
+                    <option value="Europe/London">London</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+    
+    <div>
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-key"></i> WhatsApp API Configuration</h3>
+            <div class="form-group">
+                <label class="form-label">Phone Number ID</label>
+                <input type="text" class="form-control" value="{{ config['WHATSAPP_PHONE_NUMBER_ID'] or 'Not configured' }}" disabled="">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Business Account ID</label>
+                <input type="text" class="form-control" value="{{ config['WHATSAPP_BUSINESS_ACCOUNT_ID'] or 'Not configured' }}" disabled="">
+            </div>
+            <div class="form-group">
+                <label class="form-label">API Version</label>
+                <input type="text" class="form-control" value="{{ config['WHATSAPP_API_VERSION'] }}" disabled="">
+            </div>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Configure these in your .env file
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-shield-alt"></i> Webhook Settings</h3>
+            <div class="form-group">
+                <label class="form-label">Webhook URL</label>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" class="form-control" value="{{ request.host_url }}webhook" readonly="">
+                    <button type="button" class="btn btn-secondary">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Verify Token</label>
+                <input type="text" class="form-control" value="{{ config['WHATSAPP_VERIFY_TOKEN'] }}" disabled="">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

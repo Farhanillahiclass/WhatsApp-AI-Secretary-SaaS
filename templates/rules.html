@@ -1,90 +1,96 @@
 {% extends "base.html" %}
 
-{% block title %}Auto-Reply Rules - WhatsApp Automation{% endblock %}
+{% block title %}Auto-Reply Rules - WhatsApp AI Secretary{% endblock %}
 
 {% block content %}
-<div class="rules-page">
-    <div class="page-header">
-        <h1><i class="fas fa-robot"></i> Auto-Reply Rules</h1>
+<div class="top-bar">
+    <div class="page-title">
+        <h2>Auto-Reply Rules</h2>
         <p>Create automated responses based on keywords</p>
     </div>
-    
-    <div class="card add-rule-card">
-        <h3><i class="fas fa-plus-circle"></i> Add New Rule</h3>
-        <form method="POST" action="{{ url_for('add_rule') }}" class="rule-form">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="keyword">Keyword / Trigger</label>
-                    <input type="text" id="keyword" name="keyword" required="" placeholder="e.g., hello, price, help">
-                </div>
-                
-                <div class="form-group">
-                    <label for="match_type">Match Type</label>
-                    <select id="match_type" name="match_type">
-                        <option value="exact">Exact Match</option>
-                        <option value="contains">Contains</option>
-                        <option value="starts_with">Starts With</option>
-                    </select>
-                </div>
+</div>
+
+<div class="rules-grid">
+    <div class="card rule-form-card">
+        <h3 style="margin-bottom: 1.5rem;"><i class="fas fa-plus-circle"></i> Add New Rule</h3>
+        <form method="POST" action="{{ url_for('add_rule') }}">
+            <div class="form-group">
+                <label class="form-label">Keyword / Trigger</label>
+                <input type="text" name="keyword" class="form-control" required="" placeholder="e.g., hello, price, help">
             </div>
             
             <div class="form-group">
-                <label for="response">Response Message</label>
-                <textarea id="response" name="response" rows="3" required="" placeholder="Enter the auto-reply message..."></textarea>
+                <label class="form-label">Match Type</label>
+                <select name="match_type" class="form-control">
+                    <option value="exact">Exact Match</option>
+                    <option value="contains">Contains</option>
+                    <option value="starts_with">Starts With</option>
+                </select>
             </div>
             
-            <button type="submit" class="btn btn-primary">
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select name="category" class="form-control">
+                    <option value="general">General</option>
+                    <option value="sales">Sales</option>
+                    <option value="support">Support</option>
+                    <option value="marketing">Marketing</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Response Message</label>
+                <textarea name="response" class="form-control" rows="4" required="" placeholder="Enter your auto-reply message..."></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
                 <i class="fas fa-save"></i> Save Rule
             </button>
         </form>
     </div>
     
-    <div class="card">
-        <h3><i class="fas fa-list"></i> Your Rules</h3>
-        
-        {% if rules %}
-        <div class="rules-list">
-            {% for rule in rules %}
-            <div class="rule-item {% if not rule.is_active %}inactive{% endif %}">
-                <div class="rule-content">
-                    <div class="rule-header">
-                        <span class="rule-keyword">
-                            <i class="fas fa-tag"></i> {{ rule.keyword }}
-                        </span>
-                        <span class="match-type">{{ rule.match_type.replace('_', ' ').title() }}</span>
-                    </div>
-                    <div class="rule-response">{{ rule.response }}</div>
-                    <div class="rule-meta">
-                        Created: {{ rule.created_at.strftime('%Y-%m-%d') }}
-                    </div>
+    <div>
+        {% for rule in rules %}
+        <div class="rule-item {% if not rule.is_active %}inactive{% endif %}">
+            <div class="rule-header">
+                <div>
+                    <span class="rule-keyword">{{ rule.keyword }}</span>
+                    <span class="rule-match-type">{{ rule.match_type }}</span>
+                    <span class="badge badge-info" style="margin-left: 0.5rem;">{{ rule.category }}</span>
                 </div>
-                
-                <div class="rule-actions">
-                    <form method="POST" action="{{ url_for('toggle_rule', rule_id=rule.id) }}" class="inline-form">
-                        <button type="submit" class="btn btn-icon {% if rule.is_active %}btn-warning{% else %}btn-success{% endif %}" title="{% if rule.is_active %}Deactivate{% else %}Activate{% endif %}">
+                <div style="display: flex; gap: 0.5rem;">
+                    <form method="POST" action="{{ url_for('toggle_rule', rule_id=rule.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-sm {% if rule.is_active %}btn-secondary{% else %}btn-primary{% endif %}" title="{% if rule.is_active %}Disable{% else %}Enable{% endif %}">
                             <i class="fas {% if rule.is_active %}fa-pause{% else %}fa-play{% endif %}"></i>
                         </button>
                     </form>
-                    
-                    <button type="button" class="btn btn-icon btn-info" title="Edit">
+                    <button type="button" class="btn btn-sm btn-secondary" title="Edit">
                         <i class="fas fa-edit"></i>
                     </button>
-                    
-                    <form method="POST" action="{{ url_for('delete_rule', rule_id=rule.id) }}" class="inline-form">
-                        <button type="submit" class="btn btn-icon btn-danger" title="Delete">
+                    <form method="POST" action="{{ url_for('delete_rule', rule_id=rule.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" title="Delete">
                             <i class="fas fa-trash"></i>
                         </button>
                     </form>
                 </div>
             </div>
-            {% endfor %}
+            <div class="rule-response">{{ rule.response }}</div>
+            <div class="rule-footer">
+                <div class="rule-stats">
+                    <i class="fas fa-chart-bar"></i> Used {{ rule.usage_count }} times
+                </div>
+                <div style="font-size: 0.75rem; color: var(--gray);">
+                    Created {{ rule.created_at.strftime('%b %d, %Y') }}
+                </div>
+            </div>
         </div>
         {% else %}
         <div class="empty-state">
             <i class="fas fa-robot"></i>
-            <p>No rules yet. Create your first auto-reply rule above!</p>
+            <h3>No rules yet</h3>
+            <p>Create your first auto-reply rule using the form</p>
         </div>
-        {% endif %}
+        {% endfor %}
     </div>
 </div>
 
@@ -93,28 +99,36 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>Edit Rule</h3>
-            <button type="button" class="close">×</button>
+            <button type="button" class="btn btn-icon" style="border: none; background: none; font-size: 1.5rem;">×</button>
         </div>
         <form id="editForm" method="POST" action="">
-            <div class="form-group">
-                <label for="edit_keyword">Keyword</label>
-                <input type="text" id="edit_keyword" name="keyword" required="">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Keyword</label>
+                    <input type="text" id="edit_keyword" name="keyword" class="form-control" required="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Match Type</label>
+                    <select id="edit_match_type" name="match_type" class="form-control">
+                        <option value="exact">Exact Match</option>
+                        <option value="contains">Contains</option>
+                        <option value="starts_with">Starts With</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select id="edit_category" name="category" class="form-control">
+                        <option value="general">General</option>
+                        <option value="sales">Sales</option>
+                        <option value="support">Support</option>
+                        <option value="marketing">Marketing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Response</label>
+                    <textarea id="edit_response" name="response" class="form-control" rows="4" required=""></textarea>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label for="edit_match_type">Match Type</label>
-                <select id="edit_match_type" name="match_type">
-                    <option value="exact">Exact Match</option>
-                    <option value="contains">Contains</option>
-                    <option value="starts_with">Starts With</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="edit_response">Response</label>
-                <textarea id="edit_response" name="response" rows="3" required=""></textarea>
-            </div>
-            
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary">Cancel</button>
                 <button type="submit" class="btn btn-primary">Update Rule</button>
